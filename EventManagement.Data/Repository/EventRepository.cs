@@ -3,7 +3,7 @@ using EventManagement.Data.Interface;
 
 namespace EventManagement.Data.Repository
 {
-    public class EventRepository : GenericRepository<Event>, IEventRepository
+    public class EventRepository : GenericRepository<Event>, IEventsRepository
     {
         public EventRepository(EventManagementDbContext dbContext) : base(dbContext)
         {

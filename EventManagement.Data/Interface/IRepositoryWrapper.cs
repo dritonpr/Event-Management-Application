@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EventManagement.Data.Interface
+﻿namespace EventManagement.Data.Interface
 {
-    internal interface IRepositoryWrapper
+    public interface IRepositoryWrapper
     {
+        IUserRepository User { get; }
+        IEventsRepository Events { get; }
+        Task SaveChangesAsync();
     }
 }
