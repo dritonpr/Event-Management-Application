@@ -22,12 +22,6 @@ namespace EventManagement.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var events = await _repository.Events.GetAll().ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<EventDto>>(events));
-        }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EventDto model)
@@ -65,6 +59,14 @@ namespace EventManagement.API.Controllers
             await _repository.Events.Delete(id);
             await _repository.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(DateTime? eventDate = null, string category = null)
+        {
+            var events = await _repository.Events.GetByCondition(a => (eventDate.HasValue ? a.Date.Date == eventDate.Value.Date : true)
+                                                                   && (!string.IsNullOrEmpty(category) ? a.Category == category : true)).ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<EventDto>>(events));
         }
 
         [HttpPost("{id}/rsvp")]

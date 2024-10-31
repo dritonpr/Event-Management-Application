@@ -23,12 +23,14 @@ namespace EventManagement.API.Dto
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Location is required.")]
+        [StringLength(500, ErrorMessage = "Location cannot exceed 500 characters.")]
         public string Location { get; set; }
 
         [Required(ErrorMessage = "MaxAttendees is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "MaxAttendees must be at least 1.")]
         public int MaxAttendees { get; set; }
-
+        [StringLength(200, ErrorMessage = "Category cannot exceed 200 characters.")]
+        public string Category { get; set; }
         public List<string> Attendees { get; set; } = new List<string>();
     }
 }
