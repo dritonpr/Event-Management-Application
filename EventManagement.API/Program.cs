@@ -1,7 +1,12 @@
+using EventManagement.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+// Use SQLite as the database
+builder.Services.AddDbContext<EventManagementDbContext>(options =>
+    options.UseSqlite("Data Source=event_management.db"));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
