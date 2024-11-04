@@ -1,0 +1,45 @@
+﻿@page "/events/add"
+@page "/events/edit/{EventId:int}"
+@using EventManagement.Common.Dto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<EditForm Model="Event" OnValidSubmit="SaveEvent">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="Event.Name" placeholder="Event Name" />
+    <InputTextArea @bind-Value="Event.Description" placeholder="Description" />
+    <InputDate @bind-Value="Event.Date" />
+    <InputText @bind-Value="Event.Location" placeholder="Location" />
+    <InputNumber @bind-Value="Event.MaxAttendees" placeholder="Max Attendees" />
+    <button type="submit">Save</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? EventId { get; set; }
+
+    private EventDto Event = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (EventId.HasValue)
+        {
+            Event = await Http.GetFromJsonAsync<EventDto>($"api/events/{EventId.Value}");
+        }
+    }
+
+    private async Task SaveEvent()
+    {
+        if (EventId.HasValue)
+        {
+            await Http.PutAsJsonAsync($"api/events/{EventId.Value}", Event);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/events", Event);
+        }
+        Navigation.NavigateTo("/events");
+    }
+}

@@ -1,9 +1,9 @@
-﻿using EventManagement.API.Extensions;
+﻿using EventManagement.Common.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace EventManagement.API.Dto
+namespace EventManagement.Common.Dto
 {
     public class EventDto
     {

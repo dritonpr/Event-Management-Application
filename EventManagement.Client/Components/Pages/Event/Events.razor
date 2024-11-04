@@ -1,0 +1,65 @@
+﻿@page "/events"
+@using EventManagement.Common.Dto
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Events</h3>
+
+@if (events == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var evt in events)
+        {
+            <li>
+                <strong>@evt.Name</strong> - @evt.Date
+                <br />
+                Location: @evt.Location
+                <br />
+                <button @onclick="() => DeleteEvent(evt.Id)">Delete</button>
+                <button @onclick="() => EditEvent(evt.Id)">Edit</button>
+                <button @onclick="() => RespondToEvent(evt.Id)">Respond</button>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<EventDto> events;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        events = await Http.GetFromJsonAsync<List<EventDto>>("api/events");
+    }
+
+    private async Task DeleteEvent(int id)
+    {
+        await Http.DeleteAsync($"api/events/{id}");
+        events = await Http.GetFromJsonAsync<List<EventDto>>("api/events"); // Reload list
+        await LoadEvents();
+    }
+    private async Task LoadEvents()
+    {
+        isLoading = true;
+        events = await Http.GetFromJsonAsync<List<EventDto>>("api/events");
+        isLoading = !isLoading;
+    }
+
+    private void EditEvent(int id)
+    {
+        Navigation.NavigateTo($"/events/edit/{id}");
+    }
+
+    private async Task RespondToEvent(int id)
+    {
+        var response = await Http.PostAsync($"api/events/{id}/rsvp", null);
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadEvents();
+        }
+    }
+}

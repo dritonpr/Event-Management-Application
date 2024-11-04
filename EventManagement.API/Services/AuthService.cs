@@ -1,13 +1,12 @@
-﻿using EventManagement.API.Dto;
+﻿using EventManagement.Common.Dto;
 using EventManagement.Core;
 using EventManagement.Data.Interface;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 namespace EventManagement.API.Services
 {
     public class AuthService : IAuthService

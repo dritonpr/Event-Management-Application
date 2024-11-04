@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
-using EventManagement.API.Dto;
+using EventManagement.Common.Dto;
 using EventManagement.Core;
 using EventManagement.Data.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace EventManagement.API.Controllers
 {
@@ -50,7 +48,7 @@ namespace EventManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEvent(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var eventToDelete = await _repository.Events.GetById(id);
             if (eventToDelete == null)

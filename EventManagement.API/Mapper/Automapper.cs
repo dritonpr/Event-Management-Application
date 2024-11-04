@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using EventManagement.Common.Dto;
 using EventManagement.Core;
 
-namespace EventManagement.API.Dto
+namespace EventManagement.Api.Mapper
 {
     public class Automapper : Profile
     {

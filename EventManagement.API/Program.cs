@@ -1,12 +1,9 @@
-using EventManagement.API.Dto;
+using EventManagement.Api.Mapper;
 using EventManagement.API.Services;
 using EventManagement.Data;
 using EventManagement.Data.Interface;
 using EventManagement.Data.Repository;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 

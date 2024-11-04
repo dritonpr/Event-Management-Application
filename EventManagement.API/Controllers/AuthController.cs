@@ -1,5 +1,5 @@
-﻿using EventManagement.API.Dto;
-using EventManagement.API.Services;
+﻿using EventManagement.API.Services;
+using EventManagement.Common.Dto;
 using EventManagement.Data.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +18,9 @@ namespace EventManagement.API.Controllers
             _authService = authService;
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserRegisterDto request)
+        public async Task<IActionResult> Register(UserRegisterDto model)
         {
-            if (await _authService.Register(request) == null)
+            if (await _authService.Register(model) == null)
             {
                 return BadRequest("User registration failed.");
             }
@@ -29,9 +29,9 @@ namespace EventManagement.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserLoginDto request)
+        public async Task<IActionResult> Login(UserLoginDto model)
         {
-            var token = await _authService.Login(request);
+            var token = await _authService.Login(model);
             if (token == null)
             {
                 return Unauthorized("Invalid username or password.");

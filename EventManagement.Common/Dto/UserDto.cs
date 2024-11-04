@@ -1,4 +1,4 @@
-﻿namespace EventManagement.API.Dto
+﻿namespace EventManagement.Common.Dto
 {
     public class UserDto
     {

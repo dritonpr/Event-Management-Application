@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System;
 
-namespace EventManagement.API.Extensions
+namespace EventManagement.Common.Extension
 {
     public class FutureDateAttribute : ValidationAttribute
     {

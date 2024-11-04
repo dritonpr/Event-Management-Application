@@ -1,0 +1,35 @@
+﻿@page "/register"
+@using EventManagement.Client.Services
+@using EventManagement.Common.Dto
+@inject AuthenticationService AuthService
+@inject NavigationManager Navigation
+
+<h3>Register</h3>
+<EditForm Model="registerDto" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="registerDto.Username" placeholder="Username" />
+    <InputText @bind-Value="registerDto.Password" placeholder="Password" type="password" />
+    <button type="submit">Register</button>
+</EditForm>
+
+<p>@message</p>
+
+@code {
+    private UserRegisterDto registerDto = new();
+    private string message;
+
+    private async Task HandleRegister()
+    {
+        if (await AuthService.Register(registerDto))
+        {
+            message = "Registration successful.";
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            message = "Registration failed.";
+        }
+    }
+}
