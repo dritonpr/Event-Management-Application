@@ -19,9 +19,9 @@ else
                 <br />
                 Location: @evt.Location
                 <br />
-                <button @onclick="() => DeleteEvent(evt.Id)">Delete</button>
-                <button @onclick="() => EditEvent(evt.Id)">Edit</button>
-                <button @onclick="() => RespondToEvent(evt.Id)">Respond</button>
+                <button class="btn btn-primary" @onclick="() => DeleteEvent(evt.Id)">Delete</button>
+                <button class="btn btn-primary" @onclick="() => EditEvent(evt.Id)">Edit</button>
+                <button class="btn btn-primary" @onclick="() => RespondToEvent(evt.Id)">Respond</button>
             </li>
         }
     </ul>
@@ -33,13 +33,12 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        events = await Http.GetFromJsonAsync<List<EventDto>>("api/events");
+        events = await Http.GetFromJsonAsync<List<EventDto>>("events");
     }
 
     private async Task DeleteEvent(int id)
     {
         await Http.DeleteAsync($"api/events/{id}");
-        events = await Http.GetFromJsonAsync<List<EventDto>>("api/events"); // Reload list
         await LoadEvents();
     }
     private async Task LoadEvents()
