@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
-<EditForm Model="Event" OnValidSubmit="SaveEvent">
+<EditForm Model="Event" OnValidSubmit="SaveEvent" FormName="NewEvent">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -26,7 +26,7 @@
     {
         if (EventId.HasValue)
         {
-            Event = await Http.GetFromJsonAsync<EventDto>($"api/events/{EventId.Value}");
+            Event = await Http.GetFromJsonAsync<EventDto>($"events/{EventId.Value}");
         }
     }
 
@@ -34,11 +34,11 @@
     {
         if (EventId.HasValue)
         {
-            await Http.PutAsJsonAsync($"api/events/{EventId.Value}", Event);
+            await Http.PutAsJsonAsync($"events/{EventId.Value}", Event);
         }
         else
         {
-            await Http.PostAsJsonAsync("api/events", Event);
+            await Http.PostAsJsonAsync("events", Event);
         }
         Navigation.NavigateTo("/events");
     }

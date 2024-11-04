@@ -5,7 +5,7 @@ namespace EventManagement.Core
 {
     public class Event
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required(ErrorMessage = "Event name is required.")]
         [StringLength(200, ErrorMessage = "Event name cannot exceed 200 characters.")]
@@ -13,18 +13,20 @@ namespace EventManagement.Core
 
         [Required(ErrorMessage = "Description is required.")]
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]
         [DataType(DataType.DateTime, ErrorMessage = "Please enter a valid date and time.")]
         public DateTime Date { get; set; }
         [Required(ErrorMessage = "Location is required.")]
         [StringLength(500, ErrorMessage = "Location cannot exceed 500 characters.")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
         public int MaxAttendees { get; set; }
 
         [StringLength(200, ErrorMessage = "Category cannot exceed 200 characters.")]
-        public string Category { get; set; }
+        public string? Category { get; set; } = string.Empty;
         public List<string> Attendees { get; set; } = new List<string>();
+        public long? CreatedByUserId { get; set; }
+        public List<UserFeedback> UserFeedback { get; set; }
     }
 }

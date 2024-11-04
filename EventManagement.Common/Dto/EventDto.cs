@@ -1,7 +1,4 @@
-﻿using EventManagement.Common.Extension;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EventManagement.Common.Dto
 {
@@ -15,22 +12,22 @@ namespace EventManagement.Common.Dto
 
         [Required(ErrorMessage = "Description is required.")]
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required(ErrorMessage = "Date is required.")]
         [DataType(DataType.DateTime, ErrorMessage = "Please enter a valid date and time.")]
-        [FutureDate(ErrorMessage = "Date must be in the future.")]
+        //[FutureDate(ErrorMessage = "Date must be in the future.")]
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Location is required.")]
         [StringLength(500, ErrorMessage = "Location cannot exceed 500 characters.")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         [Required(ErrorMessage = "MaxAttendees is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "MaxAttendees must be at least 1.")]
         public int MaxAttendees { get; set; }
         [StringLength(200, ErrorMessage = "Category cannot exceed 200 characters.")]
-        public string Category { get; set; }
+        public string? Category { get; set; } = string.Empty;
         public List<string> Attendees { get; set; } = new List<string>();
     }
 }

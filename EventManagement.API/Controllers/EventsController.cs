@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EventManagement.API.Services;
 using EventManagement.Common.Dto;
 using EventManagement.Core;
 using EventManagement.Data.Interface;
@@ -13,11 +14,13 @@ namespace EventManagement.API.Controllers
     {
         private readonly IRepositoryWrapper _repository;
         private readonly IMapper _mapper;
+        private readonly IMySessionService _mySessionService;
 
-        public EventsController(IRepositoryWrapper repository, IMapper mapper)
+        public EventsController(IRepositoryWrapper repository, IMapper mapper, IMySessionService mySessionService)
         {
             _repository = repository;
             _mapper = mapper;
+            _mySessionService = mySessionService;
         }
 
 
@@ -68,22 +71,31 @@ namespace EventManagement.API.Controllers
         }
 
         [HttpPost("{id}/rsvp")]
-        public async Task<IActionResult> RSVP(int id, [FromBody] string username)
+        public async Task<IActionResult> RSVP(int id, [FromBody] UserFeedbackDto userFeedbackDto)
         {
-            var eventToUpdate = await _repository.Events.GetById(id);
-            if (eventToUpdate == null)
+            var userName = _mySessionService.GetUsername();
+            var events = await _repository.Events.GetById(id);
+            if (events == null)
                 return NotFound();
 
-            if (eventToUpdate.Attendees.Contains(username))
-                return BadRequest("User already RSVP'd");
 
-            if (eventToUpdate.Attendees.Count >= eventToUpdate.MaxAttendees)
-                return BadRequest("Event is full");
+            if (!events.Attendees.Contains(userName))
+                return BadRequest("You're not allowed to give feedback to this event!");
 
-            eventToUpdate.Attendees.Add(username);
+
+            events.UserFeedback.Add(_mapper.Map<UserFeedback>(userFeedbackDto));
             await _repository.SaveChangesAsync();
-
             return Ok("RSVP successful");
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var entity = await _repository.Events.GetByCondition(a => a.Id == id).FirstOrDefaultAsync();
+            if (entity == null)
+                return NotFound();
+
+            return Ok(_mapper.Map<EventDto>(entity));
         }
     }
 

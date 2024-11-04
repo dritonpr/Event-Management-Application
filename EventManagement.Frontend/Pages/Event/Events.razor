@@ -1,0 +1,79 @@
+﻿@page "/events"
+@using EventManagement.Frontend.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+
+<h3 class="my-4">Events</h3>
+
+<div class="text-end mb-3">
+    <button class="btn btn-success" @onclick="() => AddEvent()">Add New Event</button>
+</div>
+
+@if (events == null || isLoading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var evt in events)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@evt.Name</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@evt.Date.ToShortDateString()</h6>
+                        <p class="card-text"><strong>Location:</strong> @evt.Location</p>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteEvent(evt.Id)">Delete</button>
+                            <button class="btn btn-outline-info btn-sm" @onclick="() => EditEvent(evt.Id)">Edit</button>
+                            <button class="btn btn-outline-primary btn-sm" @onclick="() => RespondToEvent(evt.Id)">Respond</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+
+@code {
+    private List<EventDto> events;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        isLoading = true;
+        events = await Http.GetFromJsonAsync<List<EventDto>>("events");
+        isLoading = false;
+    }
+
+    private async Task DeleteEvent(int id)
+    {
+        await Http.DeleteAsync($"events/{id}");
+        await LoadEvents();
+    }
+    private void AddEvent()
+    {
+        Navigation.NavigateTo($"/events/add");
+    }
+    private void EditEvent(int id)
+    {
+        Navigation.NavigateTo($"/events/edit/{id}");
+    }
+
+    private async Task RespondToEvent(int id)
+    {
+        var response = await Http.PostAsJsonAsync($"events/{id}/rsvp", "");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadEvents();
+        }
+    }
+}

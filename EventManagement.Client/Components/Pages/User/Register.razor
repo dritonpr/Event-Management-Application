@@ -4,32 +4,62 @@
 @inject AuthenticationService AuthService
 @inject NavigationManager Navigation
 
-<h3>Register</h3>
-<EditForm Model="registerDto" OnValidSubmit="HandleRegister">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <InputText @bind-Value="registerDto.Username" placeholder="Username" />
-    <InputText @bind-Value="registerDto.Password" placeholder="Password" type="password" />
-    <button type="submit">Register</button>
-</EditForm>
-
-<p>@message</p>
-
 @code {
-    private UserRegisterDto registerDto = new();
+    private UserRegisterDto registerDto = new UserRegisterDto();
     private string message;
 
     private async Task HandleRegister()
     {
-        if (await AuthService.Register(registerDto))
+        var isSuccess = await AuthService.Register(registerDto);
+        if (isSuccess)
         {
-            message = "Registration successful.";
+            message = "Registration successful. Redirecting to login...";
+            await Task.Delay(1500);
             Navigation.NavigateTo("/login");
         }
         else
         {
-            message = "Registration failed.";
+            message = "Registration failed. Please try again.";
         }
     }
 }
+<div class="d-flex justify-content-center mt-5">
+    <div class="card shadow-lg" style="width: 24rem;">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Create Account</h3>
+            <EditForm Model="registerDto" OnValidSubmit="HandleRegister" FormName="UserRegisterForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+
+                <div class="form-group mb-3">
+                    <label for="Username" class="form-label">Username</label>
+                    <InputText id="Username" class="form-control" @bind-Value="registerDto.Username" placeholder="Enter your username" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Email" class="form-label">E-mail</label>
+                    <InputText id="Email" class="form-control" @bind-Value="registerDto.Email" placeholder="Enter your email" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    <InputText id="Password" class="form-control" @bind-Value="registerDto.Password" type="password" placeholder="Enter your password" />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">Register</button>
+                </div>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <p class="text-center mt-3 @(message.Contains("successful") ? "text-success" : "text-danger")">@message</p>
+            }
+
+            <p class="text-center mt-4">
+                Already have an account? <a href="/login" class="text-decoration-none">Log in here</a>
+            </p>
+        </div>
+    </div>
+</div>
+

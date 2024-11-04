@@ -9,5 +9,7 @@ namespace EventManagement.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<UserFeedback> UserFeedback { get; set; }
+
     }
 }

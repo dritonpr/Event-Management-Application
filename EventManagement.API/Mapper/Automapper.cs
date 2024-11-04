@@ -14,6 +14,9 @@ namespace EventManagement.Api.Mapper
             this.CreateMap<Event, EventDto>().ReverseMap();
             this.CreateMap<EventDto, Event>().ReverseMap();
 
+            this.CreateMap<UserFeedback, UserFeedbackDto>().ReverseMap();
+            this.CreateMap<UserFeedbackDto, UserFeedback>().ReverseMap();
+            
         }
     }
 }

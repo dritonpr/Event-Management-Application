@@ -1,0 +1,102 @@
+﻿@page "/events/add"
+@page "/events/edit/{EventId:int}"
+@using EventManagement.Common.Dto
+@using EventManagement.Frontend.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-center mt-5">
+    <div class="card shadow-lg" style="width: 24rem;">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Create New Event</h3>
+            <EditForm Model="Event" OnValidSubmit="SaveEvent" FormName="NewEvent">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+
+                <div class="form-group mb-3">
+                    <label class="form-label" for="eventName">Event Name</label>
+                    <InputText id="eventName" class="form-control" @bind-Value="Event.Name" placeholder="Enter event name" aria-label="Event Name" />
+                </div>
+              
+                <div class="form-group mb-3">
+                    <label class="form-label" for="eventDescription">Description</label>
+                    <InputTextArea id="eventDescription" class="form-control" @bind-Value="Event.Description" placeholder="Enter event description" aria-label="Description" />
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="eventCategory">Category</label>
+                    <InputTextArea id="eventCategory" class="form-control" @bind-Value="Event.Category" placeholder="Enter event category" aria-label="Description" />
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="eventDate">Date</label>
+                    <InputDate id="eventDate" class="form-control" @bind-Value="Event.Date" aria-label="Event Date" />
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="eventLocation">Location</label>
+                    <InputText id="eventLocation" class="form-control" @bind-Value="Event.Location" placeholder="Enter event location" aria-label="Location" />
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label" for="maxAttendees">Max Attendees</label>
+                    <InputNumber id="maxAttendees" class="form-control" @bind-Value="Event.MaxAttendees" placeholder="Enter max attendees" aria-label="Max Attendees" />
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </EditForm>
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <p class="text-center mt-3 text-success">@successMessage</p>
+            }
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p class="text-center mt-3 text-danger">@errorMessage</p>
+            }
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int? EventId { get; set; }
+
+    private EventDto Event = new();
+    private string? successMessage;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (EventId.HasValue)
+        {
+            Event = await Http.GetFromJsonAsync<EventDto>($"events/{EventId.Value}");
+            if (Event == null)
+            {
+                errorMessage = "Event not found.";
+            }
+        }
+    }
+
+    private async Task SaveEvent()
+    {
+        try
+        {
+            if (EventId.HasValue)
+            {
+                var response = await Http.PutAsJsonAsync($"events/{EventId.Value}", Event);
+                response.EnsureSuccessStatusCode(); 
+                successMessage = "Event updated successfully.";
+            }
+            else
+            {
+                var response = await Http.PostAsJsonAsync("events", Event);
+                response.EnsureSuccessStatusCode(); 
+                successMessage = "Event created successfully.";
+            }
+
+            await Task.Delay(1000); 
+            Navigation.NavigateTo("/events");
+        }
+        catch (HttpRequestException ex)
+        {
+            errorMessage = $"Error saving event: {ex.Message}";
+        }
+    }
+}
