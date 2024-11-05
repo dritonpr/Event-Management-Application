@@ -4,8 +4,6 @@
 @using EventManagement.Common.Dto
 @inject AuthService AuthService
 @inject NavigationManager Navigation
-<h3>Login</h3>
-
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow-lg" style="width: 24rem;">
         <div class="card-body">
@@ -28,7 +26,7 @@
                 </div>
             </EditForm>
             <p class="text-center mt-4">
-                Create new account? <a href="/register" class="text-decoration-none">Sign up here</a>
+                Create new account? <a href="/register" class="text-decoration-none">Register here</a>
             </p>
             @if (!string.IsNullOrEmpty(errorMessage))
             {

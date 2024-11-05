@@ -1,5 +1,6 @@
 ﻿using EventManagement.Frontend.Model;
 using EventManagement.Frontend.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
@@ -40,7 +41,7 @@ namespace EventManagement.Frontend.Services
             }
             return false;
         }
-
+      
         public async Task Logout()
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", TokenKey);

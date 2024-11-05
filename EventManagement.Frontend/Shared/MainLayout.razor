@@ -1,15 +1,29 @@
-﻿@inherits LayoutComponentBase
+﻿@using EventManagement.Frontend.Services
+@inherits LayoutComponentBase
+
+@inject AuthService AuthService
+@inject NavigationManager Navigation
 
 <PageTitle>Event Management</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @if (isAuthenticated)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
 
     <main>
         <div class="top-row px-4">
-            <a href="/register" target="_blank">Register</a>
+            @if (!isAuthenticated) // Show Register link when NOT authenticated
+            {
+                <a href="/register" target="_blank">Register</a>
+            }
+            else
+            {
+                <button class="btn btn-outline-primary btn-sm" @onclick="HandleLogout">Log out</button>
+            }
         </div>
 
         <article class="content px-4">
@@ -17,3 +31,22 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool isAuthenticated;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) // Only check authentication on the first render
+        {
+            isAuthenticated = await AuthService.IsAuthenticated();
+            StateHasChanged(); // Notify Blazor to re-render the component with the new state
+        }
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthService.Logout();
+        Navigation.NavigateTo("/login");
+    }
+}
