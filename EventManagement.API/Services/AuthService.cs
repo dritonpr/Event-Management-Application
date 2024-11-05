@@ -35,13 +35,13 @@ namespace EventManagement.API.Services
             return user;
         }
 
-        public async Task<User> Login(UserLoginDto model)
+        public async Task<string> Login(UserLoginDto model)
         {
             var user = await _repository.User.GetByCondition(a => a.Username == model.Username).FirstOrDefaultAsync();
             if (user == null || !VerifyPasswordHash(model.Password, user.PasswordHash, user.PasswordSalt))
                 return null;
-            return user;
-            //return CreateToken(user);
+            //return user;
+            return CreateToken(user);
         }
 
         private void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)

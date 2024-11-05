@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddScoped<IMySessionService, MySessionService>();
-
+//builder.Services.AddAuthentication();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(Automapper));
 

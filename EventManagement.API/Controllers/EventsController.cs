@@ -85,7 +85,7 @@ namespace EventManagement.API.Controllers
             return Ok(events);
         }
 
-        [HttpPost("{id}/rsvp")]
+        [HttpPut("{id}/rsvp")]
         public async Task<IActionResult> RSVP(int id)
         {
             var userName = _mySessionService.GetUsername();
@@ -93,15 +93,15 @@ namespace EventManagement.API.Controllers
             if (events == null)
                 return NotFound();
 
-            if (events.MaxAttendees >= events.Attendees.Count())
+            if (events.MaxAttendees <= events.Attendees.Count())
                 return BadRequest("Sorry, this event has reached its maximum number of attendees. You cannot respond to this event!");
 
-            if (!events.Attendees.Contains(userName))
-                return BadRequest("You're not allowed to respond to this event!");
+            if (events.Attendees.Contains(userName))
+                return BadRequest("You already responded to this event!");
 
             events.Attendees.Add(userName);
             await _repository.SaveChangesAsync();
-            return Ok("RSVP successful");
+            return Ok("Your respond has been confirmed successfully");
         }
 
         [HttpGet("{id}")]

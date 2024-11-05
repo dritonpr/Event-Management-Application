@@ -1,85 +1,106 @@
 ﻿@page "/"
 <AuthorizedRouteView>
-@using EventManagement.Frontend.Models
-@using EventManagement.Frontend.Services
-@using System.Net.Http.Headers
-@inject HttpClient Http
-@inject NavigationManager Navigation
- @inject AuthService AuthService
+    @using EventManagement.Frontend.Models
+    @using EventManagement.Frontend.Services
+    @using System.Net.Http.Headers
+    @inject HttpClient Http
+    @inject NavigationManager Navigation
+    @inject AuthService AuthService
 
-<h3 class="my-4">Events</h3>
+    <h3 class="my-4">Events</h3>
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p class="text-center mt-3 @(message.Contains("success") ? "text-success" : "text-danger")">@message</p>
+    }
+  
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <input @bind="category" placeholder="Search by category" class="form-control" />
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" @onclick="SearchByCategory">Search</button>
+            <button class="btn btn-success ms-2" @onclick="() => AddEvent()">Add New Event</button>
+        </div>
+    </div>
 
-<div class="text-end mb-3">
-    <button class="btn btn-success" @onclick="() => AddEvent()">Add New Event</button>
-</div>
+    @if (events == null || isLoading)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+       
 
-@if (events == null || isLoading)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <div class="row">
-        @foreach (var evt in events)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">@evt.Name</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">@evt.Date.ToShortDateString()</h6>
-                        <p class="card-text"><strong>Location:</strong> @evt.Location</p>
-                        <div class="d-flex justify-content-between mt-3">
-                            <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteEvent(evt.Id)">Delete</button>
-                            <button class="btn btn-outline-info btn-sm" @onclick="() => EditEvent(evt.Id)">Edit</button>
-                            <button class="btn btn-outline-primary btn-sm" @onclick="() => RespondToEvent(evt.Id)">Respond</button>
+        <div class="row">
+            @foreach (var evt in events)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@evt.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@evt.Date.ToShortDateString()</h6>
+                            <p class="card-text"><strong>Location:</strong> @evt.Location</p>
+                            <p class="card-text"><strong>Category:</strong> @evt.Category</p>
+
+                            <div class="d-flex justify-content-between mt-3">
+                                <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteEvent(evt.Id)">Delete</button>
+                                <button class="btn btn-outline-info btn-sm" @onclick="() => EditEvent(evt.Id)">Edit</button>
+                                <button class="btn btn-outline-primary btn-sm" @onclick="() => RespondToEvent(evt.Id)">Respond</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
 
 
-@code {
-    private List<EventDto> events;
-    private bool isLoading = true;
-
-    protected override async Task OnInitializedAsync()
-    {
+    @code {
+        private List<EventDto>? events;
+        private bool isLoading = true;
+        private string? message;
+        private string category = "";
+        protected override async Task OnInitializedAsync()
+        {
         await LoadEvents();
-    }
+        }
 
-    private async Task LoadEvents()
-    {
+        private async Task LoadEvents(string Category="")
+        {
         isLoading = true;
-        events = await Http.GetFromJsonAsync<List<EventDto>>("events");
+        events = await Http.GetFromJsonAsync<List<EventDto>>($"events?category={Category}");
         isLoading = false;
-    }
+        }
 
-    private async Task DeleteEvent(int id)
-    {
+        private async Task DeleteEvent(int id)
+        {
         await Http.DeleteAsync($"events/{id}");
         await LoadEvents();
-    }
-    private void AddEvent()
-    {
+        }
+        private void AddEvent()
+        {
         Navigation.NavigateTo($"/events/add");
-    }
-    private void EditEvent(int id)
-    {
+        }
+        private void EditEvent(int id)
+        {
         Navigation.NavigateTo($"/events/edit/{id}");
-    }
+        }
 
-    private async Task RespondToEvent(int id)
-    {
+        private async Task RespondToEvent(int id)
+        {
         var token = await AuthService.GetToken();
         Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = await Http.PostAsJsonAsync($"events/{id}/rsvp", "");
+        var response = await Http.PutAsync($"events/{id}/rsvp", null);
         if (response.IsSuccessStatusCode)
         {
             await LoadEvents();
         }
+        message = await response.Content.ReadAsStringAsync();
+
+        }
+        private async Task SearchByCategory()
+        {
+        await LoadEvents(category);
+        }
     }
-}
 </AuthorizedRouteView>
