@@ -44,5 +44,5 @@ The Event Management Application is a web application developed using ASP.NET Co
 
 1. Clone the repository:
     
-   git clone [<repository-url>](https://github.com/dritonpr/Event-Management-Application)
+   git clone [https://github.com/dritonpr/Event-Management-Application]
    cd EventManagement
