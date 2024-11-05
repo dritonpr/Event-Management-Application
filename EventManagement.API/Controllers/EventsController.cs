@@ -67,11 +67,11 @@ namespace EventManagement.API.Controllers
         {
             string username = _mySessionService.GetUsername();
             var events = await _repository.Events.GetByCondition(a => (eventDate.HasValue ? a.Date.Date == eventDate.Value.Date : true)
-                                                                   && (!string.IsNullOrEmpty(category) ? a.Category == category : true))
+                                                                   && (!string.IsNullOrEmpty(category) ? a.Category.Contains(category) : true))
                      .Select(c => new EventDto()
                      {
                          Attendees = c.Attendees,
-                         Category = category,
+                         Category = c.Category,
                          CreatedByUserId = c.CreatedByUserId,
                          Date = c.Date,
                          Description = c.Description,
@@ -79,7 +79,7 @@ namespace EventManagement.API.Controllers
                          Location = c.Location,
                          MaxAttendees = c.MaxAttendees,
                          Name = c.Name,
-                         HasRespond = c.Attendees.Any(a => a == username),
+                         HasRespond = c.Attendees.Any(a => a.Contains(username)),
                      }).ToListAsync();
 
             return Ok(events);

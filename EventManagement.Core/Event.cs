@@ -24,9 +24,9 @@ namespace EventManagement.Core
         public int MaxAttendees { get; set; }
 
         [StringLength(200, ErrorMessage = "Category cannot exceed 200 characters.")]
-        public string? Category { get; set; } = string.Empty;
+        public string? Category { get; set; }
         public List<string> Attendees { get; set; } = new List<string>();
         public long? CreatedByUserId { get; set; }
-        public List<UserFeedback> UserFeedback { get; set; }
+        public List<UserFeedback>? UserFeedback { get; set; }
     }
 }

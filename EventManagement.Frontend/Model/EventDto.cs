@@ -29,5 +29,6 @@ namespace EventManagement.Frontend.Models
         [StringLength(200, ErrorMessage = "Category cannot exceed 200 characters.")]
         public string? Category { get; set; }
         public List<string> Attendees { get; set; } = new List<string>();
+        public bool HasRespond { get; set; }
     }
 }
