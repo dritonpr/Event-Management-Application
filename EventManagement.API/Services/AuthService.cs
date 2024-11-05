@@ -19,7 +19,7 @@ namespace EventManagement.API.Services
             _repository = repository;
             _configuration = configuration;
         }
-     
+
         public async Task<User> Register(UserRegisterDto model)
         {
             CreatePasswordHash(model.Password, out string passwordHash, out string passwordSalt);
@@ -35,13 +35,13 @@ namespace EventManagement.API.Services
             return user;
         }
 
-        public async Task<string> Login(UserLoginDto model)
+        public async Task<User> Login(UserLoginDto model)
         {
             var user = await _repository.User.GetByCondition(a => a.Username == model.Username).FirstOrDefaultAsync();
             if (user == null || !VerifyPasswordHash(model.Password, user.PasswordHash, user.PasswordSalt))
                 return null;
-
-            return CreateToken(user);
+            return user;
+            //return CreateToken(user);
         }
 
         private void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)
@@ -60,7 +60,7 @@ namespace EventManagement.API.Services
 
         private string CreateToken(User user)
         {
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Username) };
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Username), new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:secret"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -68,8 +68,8 @@ namespace EventManagement.API.Services
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var authToken = new JwtSecurityTokenHandler().WriteToken(token);
+            return authToken;
         }
 
 

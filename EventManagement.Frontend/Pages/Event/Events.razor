@@ -1,8 +1,11 @@
 ﻿@page "/"
-
+<AuthorizedRouteView>
 @using EventManagement.Frontend.Models
+@using EventManagement.Frontend.Services
+@using System.Net.Http.Headers
 @inject HttpClient Http
 @inject NavigationManager Navigation
+ @inject AuthService AuthService
 
 <h3 class="my-4">Events</h3>
 
@@ -70,6 +73,8 @@ else
 
     private async Task RespondToEvent(int id)
     {
+        var token = await AuthService.GetToken();
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await Http.PostAsJsonAsync($"events/{id}/rsvp", "");
         if (response.IsSuccessStatusCode)
         {
@@ -77,3 +82,4 @@ else
         }
     }
 }
+</AuthorizedRouteView>

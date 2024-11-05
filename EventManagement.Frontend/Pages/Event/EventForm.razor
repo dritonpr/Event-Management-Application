@@ -1,5 +1,6 @@
 ﻿@page "/events/add"
 @page "/events/edit/{EventId:int}"
+<AuthorizedRouteView>
 @using EventManagement.Common.Dto
 @using EventManagement.Frontend.Models
 @inject HttpClient Http
@@ -92,7 +93,7 @@
             }
 
             await Task.Delay(1000);
-            Navigation.NavigateTo("/events");
+            Navigation.NavigateTo("/");
         }
         catch (HttpRequestException ex)
         {
@@ -100,3 +101,4 @@
         }
     }
 }
+</AuthorizedRouteView>

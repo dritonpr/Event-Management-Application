@@ -4,7 +4,7 @@ namespace EventManagement.Common.Dto
 {
     public class EventDto
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required(ErrorMessage = "Event name is required.")]
         [StringLength(100, ErrorMessage = "Event name cannot exceed 100 characters.")]
@@ -31,5 +31,6 @@ namespace EventManagement.Common.Dto
         public List<string> Attendees { get; set; } = new List<string>();
         public long? CreatedByUserId { get; set; }
         public List<UserFeedbackDto> UserFeedback { get; set; } = new List<UserFeedbackDto>();
+        public bool HasRespond { get; set; }
     }
 }

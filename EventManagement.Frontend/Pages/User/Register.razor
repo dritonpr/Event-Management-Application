@@ -1,28 +1,10 @@
 ﻿@page "/register"
 @using EventManagement.Frontend.Services
 @using EventManagement.Frontend.Model
-@inject AuthenticationService AuthService
+@inject AuthService AuthService
 @inject NavigationManager Navigation
 
-@code {
-    private UserRegisterDto registerDto = new UserRegisterDto();
-    private string message;
 
-    private async Task HandleRegister()
-    {
-        var isSuccess = await AuthService.Register(registerDto);
-        if (isSuccess)
-        {
-            message = "Registration successful. Redirecting to login...";
-            await Task.Delay(1500);
-            Navigation.NavigateTo("/login");
-        }
-        else
-        {
-            message = "Registration failed. Please try again.";
-        }
-    }
-}
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow-lg" style="width: 24rem;">
         <div class="card-body">
@@ -63,3 +45,22 @@
     </div>
 </div>
 
+@code {
+    private UserRegisterDto registerDto = new UserRegisterDto();
+    private string message;
+
+    private async Task HandleRegister()
+    {
+        var isSuccess = await AuthService.Register(registerDto);
+        if (isSuccess)
+        {
+            message = "Registration successful. Redirecting to login...";
+            await Task.Delay(1500);
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            message = "Registration failed. Please try again.";
+        }
+    }
+}

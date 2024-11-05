@@ -1,0 +1,32 @@
+﻿@using EventManagement.Frontend.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+@code {
+    private bool isAuthenticated;
+    private bool isInitialized = false;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isAuthenticated = await AuthService.IsAuthenticated();
+            isInitialized = true;
+
+            if (!isAuthenticated)
+            {
+                Navigation.NavigateTo("/login");
+            }
+
+            StateHasChanged(); // Notify the component to re-render
+        }
+    }
+}
+
+@if (isInitialized && isAuthenticated)
+{
+    @ChildContent
+}

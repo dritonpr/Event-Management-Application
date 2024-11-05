@@ -10,15 +10,16 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddAuthorizationCore();
 
-// Register custom services
-builder.Services.AddScoped<AuthenticationService>();
-builder.Services.AddScoped<CustomAuthStateProvider>();
-//builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-
+// Custom services
+builder.Services.AddScoped<AuthService>();
 // Configure HttpClient
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7147/api/") });
 
-
+//builder.Services.AddScoped(sp =>
+//{
+//    var handler = new AuthenticatedHttpClientHandler(sp.GetRequiredService<AuthService>());
+//    return new HttpClient(handler) { BaseAddress = new Uri("https://localhost:7147/api/") };
+//});
 
 var app = builder.Build();
 

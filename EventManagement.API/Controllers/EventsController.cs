@@ -65,25 +65,41 @@ namespace EventManagement.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(DateTime? eventDate = null, string category = null)
         {
+            string username = _mySessionService.GetUsername();
             var events = await _repository.Events.GetByCondition(a => (eventDate.HasValue ? a.Date.Date == eventDate.Value.Date : true)
-                                                                   && (!string.IsNullOrEmpty(category) ? a.Category == category : true)).ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<EventDto>>(events));
+                                                                   && (!string.IsNullOrEmpty(category) ? a.Category == category : true))
+                     .Select(c => new EventDto()
+                     {
+                         Attendees = c.Attendees,
+                         Category = category,
+                         CreatedByUserId = c.CreatedByUserId,
+                         Date = c.Date,
+                         Description = c.Description,
+                         Id = c.Id,
+                         Location = c.Location,
+                         MaxAttendees = c.MaxAttendees,
+                         Name = c.Name,
+                         HasRespond = c.Attendees.Any(a => a == username),
+                     }).ToListAsync();
+
+            return Ok(events);
         }
 
         [HttpPost("{id}/rsvp")]
-        public async Task<IActionResult> RSVP(int id, [FromBody] UserFeedbackDto userFeedbackDto)
+        public async Task<IActionResult> RSVP(int id)
         {
             var userName = _mySessionService.GetUsername();
             var events = await _repository.Events.GetById(id);
             if (events == null)
                 return NotFound();
 
+            if (events.MaxAttendees >= events.Attendees.Count())
+                return BadRequest("Sorry, this event has reached its maximum number of attendees. You cannot respond to this event!");
 
             if (!events.Attendees.Contains(userName))
-                return BadRequest("You're not allowed to give feedback to this event!");
+                return BadRequest("You're not allowed to respond to this event!");
 
-
-            events.UserFeedback.Add(_mapper.Map<UserFeedback>(userFeedbackDto));
+            events.Attendees.Add(userName);
             await _repository.SaveChangesAsync();
             return Ok("RSVP successful");
         }

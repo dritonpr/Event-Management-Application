@@ -20,14 +20,25 @@ namespace EventManagement.Frontend.Services
 
         public async Task<string> Login(UserLoginDto loginDto)
         {
-            var response = await _httpClient.PostAsJsonAsync("auth/login", loginDto);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var result = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-                return result?["Token"];
+                var response = await _httpClient.PostAsJsonAsync("auth/login", loginDto);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+                    return result;
+                }
+                else
+                    return string.Empty;
             }
-            return null;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred during login: {ex.Message}");
+                return string.Empty;
+            }
         }
-    
+
+
     }
 }

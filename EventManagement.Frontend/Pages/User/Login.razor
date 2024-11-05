@@ -2,8 +2,7 @@
 @using EventManagement.Frontend.Models
 @using EventManagement.Frontend.Services
 @using EventManagement.Common.Dto
-@inject AuthenticationService AuthService
-@inject CustomAuthStateProvider AuthStateProvider
+@inject AuthService AuthService
 @inject NavigationManager Navigation
 <h3>Login</h3>
 
@@ -47,15 +46,11 @@
 
     private async Task HandleLogin()
     {
-        var token = await AuthService.Login(loginDto);
-        if (token != null)
+        var success = await AuthService.Login(loginDto);
+        errorMessage = success ? "Login successful!" : "Login failed!";
+        if (success)
         {
-            AuthStateProvider.NotifyUserAuthentication(token);
-            Navigation.NavigateTo("/events");
-        }
-        else
-        {
-            errorMessage = "Invalid login attempt.";
+            Navigation.NavigateTo("/");
         }
     }
 }
