@@ -12,7 +12,7 @@
     {
         <p class="text-center mt-3 @(message.Contains("success") ? "text-success" : "text-danger")">@message</p>
     }
-  
+
     <div class="row mb-3">
         <div class="col-md-8">
             <input @bind="category" placeholder="Search by category" class="form-control" />
@@ -29,7 +29,7 @@
     }
     else
     {
-       
+
 
         <div class="row">
             @foreach (var evt in events)
@@ -56,24 +56,29 @@
 
 
     @code {
+
         private List<EventDto>? events;
         private bool isLoading = true;
         private string? message;
         private string category = "";
         protected override async Task OnInitializedAsync()
         {
-        await LoadEvents();
+            await LoadEvents();
         }
 
-        private async Task LoadEvents(string Category="")
+        private async Task LoadEvents(string Category = "")
         {
+
+        // await GetToken();
         isLoading = true;
+
         events = await Http.GetFromJsonAsync<List<EventDto>>($"events?category={Category}");
         isLoading = false;
         }
 
         private async Task DeleteEvent(int id)
         {
+        await GetToken();
         await Http.DeleteAsync($"events/{id}");
         await LoadEvents();
         }
@@ -88,8 +93,7 @@
 
         private async Task RespondToEvent(int id)
         {
-        var token = await AuthService.GetToken();
-        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        await GetToken();
         var response = await Http.PutAsync($"events/{id}/rsvp", null);
         if (response.IsSuccessStatusCode)
         {
@@ -101,6 +105,11 @@
         private async Task SearchByCategory()
         {
         await LoadEvents(category);
+        }
+        private async Task GetToken()
+        {
+        var token = await AuthService.GetToken();
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
     }
 </AuthorizedRouteView>

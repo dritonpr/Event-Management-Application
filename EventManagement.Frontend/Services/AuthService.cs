@@ -48,7 +48,15 @@ namespace EventManagement.Frontend.Services
 
         public async Task<string> GetToken()
         {
-            return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
+            try
+            {
+                return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
+            }
+            catch (Exception ex)
+            {
+                return string.Empty;
+            }
+
         }
         public async Task<bool> IsAuthenticated()
         {

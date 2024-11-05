@@ -1,9 +1,13 @@
 using EventManagement.Api.Mapper;
+using EventManagement.API.Helpers;
+using EventManagement.API.Security;
 using EventManagement.API.Services;
 using EventManagement.Data;
 using EventManagement.Data.Interface;
 using EventManagement.Data.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +23,36 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddScoped<IMySessionService, MySessionService>();
-//builder.Services.AddAuthentication();
+
+
+var jwtTokenConfig = builder.Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
+builder.Services.ConfigureJwtServices(jwtTokenConfig);
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomSchemaIds(type => type.FullName); // Use the full name (namespace + type) as the schema ID to avoid conflicts
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Alleta", Version = "v1" });
+    c.SchemaFilter<DefaultValueFilter>();
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "JWT Authentication",
+        Description = "Enter JWT Bearer token **_only_**",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer", // must be lower case
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {securityScheme, new string[] { }}
+                });
+});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(Automapper));
 
@@ -46,6 +79,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers();//.RequireAuthorization();
 
 app.Run();
