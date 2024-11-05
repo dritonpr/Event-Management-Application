@@ -27,10 +27,12 @@ namespace EventManagement.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EventDto model)
         {
+            var userid = _mySessionService.GetUserId(); 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             Event entity = _mapper.Map<Event>(model);
+            entity.CreatedByUserId = userid;
             await _repository.Events.Create(entity);
             await _repository.SaveChangesAsync();
             return Ok(model);
@@ -53,13 +55,19 @@ namespace EventManagement.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            var userId = _mySessionService.GetUserId();
+
             var eventToDelete = await _repository.Events.GetById(id);
             if (eventToDelete == null)
                 return NotFound();
-
-            await _repository.Events.Delete(id);
-            await _repository.SaveChangesAsync();
-            return NoContent();
+            if (eventToDelete.CreatedByUserId == userId)
+            {
+                await _repository.Events.Delete(id);
+                await _repository.SaveChangesAsync();
+                return NoContent();
+            }
+            return BadRequest("You're not authorized to delete this event!");
+            
         }
 
         [HttpGet]
