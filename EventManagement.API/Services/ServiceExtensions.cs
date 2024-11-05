@@ -10,6 +10,7 @@ namespace EventManagement.API.Services
         public static void ConfigureJwtServices(this IServiceCollection services, JwtTokenConfig jwtTokenConfig)
         {
             services.AddSingleton<IJwtAuthManager, JwtAuthManager>();
+            //services.AddHostedService<JwtRefreshTokenCache>();
             services.AddSingleton(jwtTokenConfig);
             services.AddAuthentication(x =>
             {
@@ -29,21 +30,6 @@ namespace EventManagement.API.Services
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1)
-                };
-                x.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        var authorizationHeader = context.Request.Headers["Authorization"].ToString();
-
-                        if (!string.IsNullOrEmpty(authorizationHeader) && authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Extract the token part from "Bearer {token}"
-                            context.Token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                        }
-
-                        return Task.CompletedTask;
-                    }
                 };
             });
         }
