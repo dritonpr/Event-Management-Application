@@ -3,6 +3,7 @@
     @using EventManagement.Frontend.Models
     @using EventManagement.Frontend.Services
     @using System.Net.Http.Headers
+    @inject ApiService ApiService
     @inject HttpClient Http
     @inject NavigationManager Navigation
     @inject AuthService AuthService
@@ -63,7 +64,7 @@
         private string category = "";
         protected override async Task OnInitializedAsync()
         {
-            await LoadEvents();
+        await LoadEvents();
         }
 
         private async Task LoadEvents(string Category = "")
@@ -93,8 +94,10 @@
 
         private async Task RespondToEvent(int id)
         {
-        await GetToken();
-        var response = await Http.PutAsync($"events/{id}/rsvp", null);
+
+         await GetToken();
+
+        var response = await ApiService.PutAsync($"events/{id}/rsvp", null);
         if (response.IsSuccessStatusCode)
         {
             await LoadEvents();
@@ -106,10 +109,13 @@
         {
         await LoadEvents(category);
         }
+
+
         private async Task GetToken()
         {
+        // Logic to retrieve token after login
         var token = await AuthService.GetToken();
-        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        ApiService.SetBearerToken(token);
         }
     }
 </AuthorizedRouteView>
