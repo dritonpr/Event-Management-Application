@@ -37,11 +37,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) // Only check authentication on the first render
-        {
+        // if (firstRender) // Only check authentication on the first render
+        // {
             isAuthenticated = await AuthService.IsAuthenticated();
             StateHasChanged(); // Notify Blazor to re-render the component with the new state
-        }
+        // }
     }
 
     private async Task HandleLogout()

@@ -3,7 +3,7 @@
 @using EventManagement.Frontend.Model
 @inject AuthService AuthService
 @inject NavigationManager Navigation
-
+ @inject IMessageService MessageService
 
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow-lg" style="width: 24rem;">
@@ -39,7 +39,7 @@
             }
 
             <p class="text-center mt-4">
-                Already have an account? <a href="/login" class="text-decoration-none">Log in here</a>
+               <a href="/login" class="text-decoration-none">Log in here</a>
             </p>
         </div>
     </div>
@@ -54,8 +54,9 @@
         var isSuccess = await AuthService.Register(registerDto);
         if (isSuccess)
         {
-            message = "Registration successful. Redirecting to login...";
-            await Task.Delay(2000);
+            message = "Registration successful. Please login!";
+            MessageService.SetMessage(message);
+            // await Task.Delay(2000);
             Navigation.NavigateTo("/login");
         }
         else

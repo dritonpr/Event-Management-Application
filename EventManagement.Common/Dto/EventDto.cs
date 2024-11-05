@@ -30,6 +30,7 @@ namespace EventManagement.Common.Dto
         public string? Category { get; set; } = string.Empty;
         public List<string> Attendees { get; set; } = new List<string>();
         public long? CreatedByUserId { get; set; }
+        public string? CreatedByUsername { get; set; }
         public List<UserFeedbackDto> UserFeedback { get; set; } = new List<UserFeedbackDto>();
         public bool HasRespond { get; set; }
     }

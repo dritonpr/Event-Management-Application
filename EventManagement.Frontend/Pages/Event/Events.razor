@@ -7,11 +7,12 @@
     @inject HttpClient Http
     @inject NavigationManager Navigation
     @inject AuthService AuthService
+    @inject IMessageService MessageService
 
     <h3 class="my-4">Events</h3>
     @if (!string.IsNullOrEmpty(message))
     {
-        <p class="text-center mt-3 @(message.Contains("success") ? "text-success" : "text-danger")">@message</p>
+        <h4 class="text-center mt-3 @(message.Contains("success") ? "text-success" : "text-danger")">@message</h4>
     }
 
     <div class="row mb-3">
@@ -44,6 +45,10 @@
                             <h6 class="card-subtitle mb-2 text-muted">@evt.Date.ToShortDateString()</h6>
                             <p class="card-text"><strong>Location:</strong> @evt.Location</p>
                             <p class="card-text"><strong>Category:</strong> @evt.Category</p>
+                            <p class="card-text"><strong>Description:</strong> @evt.Description</p>
+
+                            <p class="card-text"><strong>Created by:</strong> @evt.CreatedByUsername</p>
+
 
                             <div class="d-flex justify-content-between mt-3">
                                 <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteEvent(evt.Id)">Delete</button>
@@ -74,6 +79,7 @@
         private string category = "";
         protected override async Task OnInitializedAsync()
         {
+        message = MessageService.GetMessage();
         await LoadEvents();
         }
 
@@ -82,14 +88,41 @@
         await GetToken();
         isLoading = true;
 
-        events = await Http.GetFromJsonAsync<List<EventDto>>($"events?category={Category}");
-        isLoading = false;
+        try
+        {
+            var response = await Http.GetAsync($"events?category={Category}");
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                Navigation.NavigateTo($"/login");
+                return;
+            }
+            response.EnsureSuccessStatusCode();
+            events = await response.Content.ReadFromJsonAsync<List<EventDto>>();
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions (optional)
+            Console.WriteLine($"Error loading events: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
         }
 
         private async Task DeleteEvent(int id)
         {
         await GetToken();
-        await Http.DeleteAsync($"events/{id}");
+        var response = await Http.DeleteAsync($"events/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            message = await response.Content.ReadAsStringAsync();
+        }
+        else
+        {
+            message = "Event deleted successfully.";
+        }
         await LoadEvents();
         }
         private void AddEvent()

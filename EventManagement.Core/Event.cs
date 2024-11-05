@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
 namespace EventManagement.Core
@@ -27,6 +28,7 @@ namespace EventManagement.Core
         public string? Category { get; set; }
         public List<string> Attendees { get; set; } = new List<string>();
         public long? CreatedByUserId { get; set; }
+        public string? CreatedByUsername { get; set; }
         public List<UserFeedback>? UserFeedback { get; set; }
     }
 }

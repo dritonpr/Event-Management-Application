@@ -1,70 +1,74 @@
 ﻿@page "/events/add"
 @page "/events/edit/{EventId:int}"
 <AuthorizedRouteView>
-@using EventManagement.Common.Dto
-@using EventManagement.Frontend.Models
-@inject HttpClient Http
-@inject NavigationManager Navigation
+    @using EventManagement.Common.Dto
+    @using EventManagement.Frontend.Models
+    @using EventManagement.Frontend.Services
+    @inject HttpClient Http
+    @inject NavigationManager Navigation
+    @inject IMessageService MessageService
+    <div>
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Create / Update  Event</h3>
+                <EditForm Model="Event" OnValidSubmit="SaveEvent" FormName="NewEvent">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
 
-<div>
-    <div class="card shadow-lg">
-        <div class="card-body">
-            <h3 class="card-title text-center mb-4">Create New Event</h3>
-            <EditForm Model="Event" OnValidSubmit="SaveEvent" FormName="NewEvent">
-                <DataAnnotationsValidator />
-                <ValidationSummary class="text-danger" />
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="eventName">Event Name</label>
+                        <InputText id="eventName" class="form-control" @bind-Value="Event.Name" placeholder="Enter event name" aria-label="Event Name" />
+                    </div>
 
-                <div class="form-group mb-3">
-                    <label class="form-label" for="eventName">Event Name</label>
-                    <InputText id="eventName" class="form-control" @bind-Value="Event.Name" placeholder="Enter event name" aria-label="Event Name" />
-                </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="eventDescription">Description</label>
+                        <InputTextArea id="eventDescription" class="form-control" @bind-Value="Event.Description" placeholder="Enter event description" aria-label="Description" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="eventCategory">Category</label>
+                        <InputTextArea id="eventCategory" class="form-control" @bind-Value="Event.Category" placeholder="Enter event category" aria-label="Description" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="eventLocation">Location</label>
+                        <InputText id="eventLocation" class="form-control" @bind-Value="Event.Location" placeholder="Enter event location" aria-label="Location" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="eventDate">Date</label>
+                        <InputDate id="eventDate" class="form-control" @bind-Value="Event.Date" aria-label="Event Date" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="maxAttendees">Max Attendees</label>
+                        <InputNumber id="maxAttendees" class="form-control" @bind-Value="Event.MaxAttendees" placeholder="Enter max attendees" aria-label="Max Attendees" />
+                    </div>
 
-                <div class="form-group mb-3">
-                    <label class="form-label" for="eventDescription">Description</label>
-                    <InputTextArea id="eventDescription" class="form-control" @bind-Value="Event.Description" placeholder="Enter event description" aria-label="Description" />
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label" for="eventCategory">Category</label>
-                    <InputTextArea id="eventCategory" class="form-control" @bind-Value="Event.Category" placeholder="Enter event category" aria-label="Description" />
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label" for="eventLocation">Location</label>
-                    <InputText id="eventLocation" class="form-control" @bind-Value="Event.Location" placeholder="Enter event location" aria-label="Location" />
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label" for="eventDate">Date</label>
-                    <InputDate id="eventDate" class="form-control" @bind-Value="Event.Date" aria-label="Event Date" />
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label" for="maxAttendees">Max Attendees</label>
-                    <InputNumber id="maxAttendees" class="form-control" @bind-Value="Event.MaxAttendees" placeholder="Enter max attendees" aria-label="Max Attendees" />
-                </div>
+                    <div class="d-grid">
+                        <br />
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                    <h3 class="card-title text-center mb-4"> <a href="/" class="btn btn-link  text-center">Go to list of events!</a></h3>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success">Save</button>
-                </div>
-            </EditForm>
-            @if (!string.IsNullOrEmpty(successMessage))
-            {
-                <p class="text-center mt-3 text-success">@successMessage</p>
-            }
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <p class="text-center mt-3 text-danger">@errorMessage</p>
-            }
+                </EditForm>
+                @if (!string.IsNullOrEmpty(successMessage))
+                {
+                    <h4 class="text-center mt-3 text-success">@successMessage</h4>
+                }
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <h4 class="text-center mt-3 text-danger">@errorMessage</h4>
+                }
+            </div>
         </div>
     </div>
-</div>
-@code {
-    [Parameter]
-    public int? EventId { get; set; }
+    @code {
+        [Parameter]
+        public int? EventId { get; set; }
 
-    private EventDto Event = new EventDto() { Date = DateTime.Now};
-    private string? successMessage;
-    private string? errorMessage;
+        private EventDto Event = new EventDto() { Date = DateTime.Now };
+        private string? successMessage;
+        private string? errorMessage;
 
-    protected override async Task OnInitializedAsync()
-    {
+        protected override async Task OnInitializedAsync()
+        {
         if (EventId.HasValue)
         {
             Event = await Http.GetFromJsonAsync<EventDto>($"events/{EventId.Value}");
@@ -73,32 +77,51 @@
                 errorMessage = "Event not found.";
             }
         }
-    }
+        }
 
-    private async Task SaveEvent()
-    {
+        private async Task SaveEvent()
+        {
         try
         {
+
+
+            HttpResponseMessage response;
             if (EventId.HasValue)
             {
-                var response = await Http.PutAsJsonAsync($"events/{EventId.Value}", Event);
-                response.EnsureSuccessStatusCode();
-                successMessage = "Event updated successfully.";
+                response = await Http.PutAsJsonAsync($"events/{EventId.Value}", Event);
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorMessage = await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    successMessage = "Event updated successfully.";
+                    MessageService.SetMessage(successMessage);
+                    Navigation.NavigateTo("/");
+                }
             }
             else
             {
-                var response = await Http.PostAsJsonAsync("events", Event);
-                response.EnsureSuccessStatusCode();
-                successMessage = "Event created successfully.";
+                response = await Http.PostAsJsonAsync("events", Event);
+                if (!response.IsSuccessStatusCode)
+                {
+                    errorMessage = await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    successMessage = "Event created successfully.";
+                    MessageService.SetMessage(successMessage);
+                    Navigation.NavigateTo("/");
+                }
             }
 
-            await Task.Delay(2000);
-            Navigation.NavigateTo("/");
+
         }
         catch (HttpRequestException ex)
         {
+            // Log the error and provide a user-friendly message
             errorMessage = $"Error saving event: {ex.Message}";
         }
+        }
     }
-}
 </AuthorizedRouteView>

@@ -27,12 +27,15 @@ namespace EventManagement.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EventDto model)
         {
-            var userid = _mySessionService.GetUserId(); 
+            var userid = _mySessionService.GetUserId();
+            var username = _mySessionService.GetUsername();
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+
             Event entity = _mapper.Map<Event>(model);
             entity.CreatedByUserId = userid;
+            entity.CreatedByUsername = username;
             await _repository.Events.Create(entity);
             await _repository.SaveChangesAsync();
             return Ok(model);
@@ -41,15 +44,22 @@ namespace EventManagement.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] EventDto model)
         {
-            var eventToUpdate = await _repository.Events.GetById(id);
+            var userid = _mySessionService.GetUserId();
+            var entity = await _repository.Events.GetById(id);
 
-            if (eventToUpdate == null)
+            if (entity == null)
                 return NotFound();
-
-            var entity = _mapper.Map(model, eventToUpdate);
-            await _repository.Events.Update(entity);
-            await _repository.SaveChangesAsync();
-            return Ok(model);
+            if (userid == entity.CreatedByUserId)
+            {
+                entity.Location = model.Location;
+                entity.Category = model.Category;
+                entity.Date = model.Date;
+                entity.Description = model.Description;
+                entity.Name = model.Name;
+                await _repository.SaveChangesAsync();
+                return Ok(model);
+            }
+            return BadRequest("You're not authorized to update this event!");
         }
 
         [HttpDelete("{id}")]
@@ -67,7 +77,7 @@ namespace EventManagement.API.Controllers
                 return NoContent();
             }
             return BadRequest("You're not authorized to delete this event!");
-            
+
         }
 
         [HttpGet]
@@ -75,7 +85,7 @@ namespace EventManagement.API.Controllers
         {
             string username = _mySessionService.GetUsername();
             var events = await _repository.Events.GetByCondition(a => (eventDate.HasValue ? a.Date.Date == eventDate.Value.Date : true)
-                                                                   && (!string.IsNullOrEmpty(category) ? a.Category.Contains(category) : true))
+                                                                   && (!string.IsNullOrEmpty(category) ? a.Category.ToLower().Contains(category.ToLower()) : true))
                      .Select(c => new EventDto()
                      {
                          Attendees = c.Attendees,
@@ -88,6 +98,7 @@ namespace EventManagement.API.Controllers
                          MaxAttendees = c.MaxAttendees,
                          Name = c.Name,
                          HasRespond = c.Attendees.Any(a => a.Contains(username)),
+                         CreatedByUsername = c.CreatedByUsername
                      }).ToListAsync();
 
             return Ok(events);

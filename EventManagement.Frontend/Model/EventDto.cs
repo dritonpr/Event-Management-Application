@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EventManagement.Frontend.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventManagement.Frontend.Models
 {
@@ -16,6 +17,7 @@ namespace EventManagement.Frontend.Models
 
         [Required(ErrorMessage = "Date is required.")]
         [DataType(DataType.DateTime, ErrorMessage = "Please enter a valid date and time.")]
+        [FutureDate(ErrorMessage = "Date must be in the future.")]
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Location is required.")]
@@ -30,5 +32,6 @@ namespace EventManagement.Frontend.Models
         public string? Category { get; set; }
         public List<string> Attendees { get; set; } = new List<string>();
         public bool HasRespond { get; set; }
+        public string? CreatedByUsername { get; set; }
     }
 }

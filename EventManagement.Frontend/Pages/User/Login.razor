@@ -4,6 +4,8 @@
 @using EventManagement.Common.Dto
 @inject AuthService AuthService
 @inject NavigationManager Navigation
+@inject IMessageService MessageService
+
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow-lg" style="width: 24rem;">
         <div class="card-body">
@@ -30,7 +32,7 @@
             </p>
             @if (!string.IsNullOrEmpty(errorMessage))
             {
-                <p class="text-center mt-3 @(errorMessage.Contains("successful") ? "text-success" : "text-danger")">@errorMessage</p>
+                <p class="text-center mt-3 @(errorMessage.Contains("success") ? "text-success" : "text-danger")">@errorMessage</p>
             }
 
 
@@ -50,5 +52,9 @@
         {
             Navigation.NavigateTo("/");
         }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        errorMessage = MessageService.GetMessage();
     }
 }
