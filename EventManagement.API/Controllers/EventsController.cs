@@ -56,6 +56,7 @@ namespace EventManagement.API.Controllers
                 entity.Date = model.Date;
                 entity.Description = model.Description;
                 entity.Name = model.Name;
+                entity.MaxAttendees = model.MaxAttendees;
                 await _repository.SaveChangesAsync();
                 return Ok(model);
             }

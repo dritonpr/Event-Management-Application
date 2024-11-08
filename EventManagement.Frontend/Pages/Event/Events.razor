@@ -156,8 +156,8 @@
 
         private async Task GetToken()
         {
-        var token = await AuthService.GetToken();
-        ApiService.SetBearerToken(token);
+          var token = await AuthService.GetToken();
+          ApiService.SetBearerToken(token);
         }
     }
 </AuthorizedRouteView>
